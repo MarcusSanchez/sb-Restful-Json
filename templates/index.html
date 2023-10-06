@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cupcakes</title>
+</head>
+
+<body>
+  <h1>CUPCAKES-R-US</h1>
+  <hr>
+  <br>
+
+  <h2>Create Cupcake</h2>
+  <form>
+    <label>
+      Flavor:
+      <input id="flavor" placeholder="flavor..." required>
+    </label><br>
+
+    <label>
+      Size:
+      <input id="size" placeholder="size..." required>
+    </label><br>
+
+    <label>
+      Rating:
+      <input id="rating" placeholder="rating..." required>
+    </label><br>
+
+    <label>
+      Image:
+      <input id="image" placeholder="image...">
+    </label><br>
+
+    <button type="submit">Create</button>
+  </form>
+  <hr>
+  <br>
+
+  <h2>Our Cupcakes</h2>
+  <ul id="cupcakes"></ul>
+
+  <script>
+    (async () => {
+      const cupcakes_list = document.getElementById('cupcakes');
+      const response = await fetch('/api/cupcakes');
+      const json = await response.json();
+      const cupcakes = json['cupcakes'];
+
+      cupcakes.forEach(cupcake => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <h3>${cupcake["flavor"]}</h3>
+          <p>Size: ${cupcake["size"]}</p>
+          <p>Rating: ${cupcake["rating"]}</p>
+          <img src="${cupcake["image"]}" alt="${cupcake.flavor}" width="50" height="50">
+        `;
+        cupcakes_list.appendChild(li);
+      });
+
+      const form = document.querySelector('form');
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const flavor = document.getElementById('flavor').value;
+        const size = document.getElementById('size').value;
+        const rating = document.getElementById('rating').value;
+        const image = document.getElementById('image').value;
+
+        const data = {
+          flavor: flavor,
+          size: size,
+          rating: rating,
+          image: image ? image !== '' : undefined
+        };
+
+        await fetch('/api/cupcakes', {
+          method: 'POST',
+          body: JSON.stringify(data),
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        document.location.reload();
+      });
+    })()
+  </script>
+</body>
+</html>
